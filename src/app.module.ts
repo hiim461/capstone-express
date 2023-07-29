@@ -8,6 +8,7 @@ import { CommentModule } from './comment/comment.module';
 import { SaveimageModule } from './saveimage/saveimage.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [

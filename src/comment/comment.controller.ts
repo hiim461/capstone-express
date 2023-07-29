@@ -36,10 +36,10 @@ export class CommentController {
     return this.commentService.create(createCommentDto, +verifyToken?.nguoi_dung_id);
   }
 
-  @Get()
-  findAll() {
-    return this.commentService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.commentService.findAll();
+  // }
 
   @ApiHeader({ name: 'token' })
   @HttpCode(200)
@@ -48,13 +48,13 @@ export class CommentController {
     return this.commentService.findCmtByImg(+hinh_id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentService.update(+id, updateCommentDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
+  //   return this.commentService.update(+id, updateCommentDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.commentService.remove(+id);
+  // }
 }

@@ -2,6 +2,7 @@ import { Injectable, HttpException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from "bcryptjs" 
 
 @Injectable()
 export class UserService {
@@ -37,13 +38,15 @@ export class UserService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
+      const newUser = {...updateUserDto, mat_khau: bcrypt.hashSync(updateUserDto.mat_khau,10)}
+      const {mat_khau:pw, ...newU} = newUser
       const data = await this.prisma.nguoi_dung.update({
-        data: updateUserDto,
+        data: newU,
         where: { nguoi_dung_id: id },
       });
       throw new HttpException(
         {
-          mess: { data, message: 'Update successful', statusCode: 200 },
+          mess: { data:newU, message: 'Update successful', statusCode: 200 },
           code: 200,
         },
         200,

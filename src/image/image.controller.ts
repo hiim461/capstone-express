@@ -40,6 +40,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
 import * as fs from 'fs/promises';
+import * as fs1 from 'fs';
+import * as sharp from 'sharp';
 
 class FileUploadDto {
   @ApiProperty({
@@ -47,6 +49,8 @@ class FileUploadDto {
     format: 'binary',
   })
   file: any;
+  @ApiProperty()
+  mo_ta: string;
 }
 @ApiBearerAuth()
 // @UseGuards(AuthGuard('jwt'))
@@ -73,7 +77,11 @@ export class ImageController {
   @ApiHeader({ name: 'token' })
   @HttpCode(200)
   @Post('upload-image')
-  async upLoadImage(@UploadedFile() file: Express.Multer.File, @Req() req) {
+  async upLoadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req,
+    @Body() { mo_ta },
+  ) {
     const verifyToken = await req['data'];
     if (!req['authenticated']) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -81,19 +89,33 @@ export class ImageController {
     if (!file) {
       throw new HttpException('No image file uploaded', HttpStatus.BAD_REQUEST);
     }
+
+    const validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    const fileExtension = file.originalname.split('.').pop().toLowerCase();
+    if (!validExtensions.includes(fileExtension)) {
+      const del = join(process.cwd(), 'public', 'img', file.filename);
+      await fs1.unlinkSync(del);
+      throw new HttpException('Invalid file extension', HttpStatus.BAD_REQUEST);
+    }
+
+    const compressedImagePath = file.path;
     try {
-      const imagePath = process.cwd() + '/public/img/' + file.filename;
-      const data = await fs.readFile(imagePath);
-      const newName =
-        'data:' + file.mimetype + ';base64,' + data.toString('base64');
-      return this.imageService.create(
-        file,
-        +verifyToken?.nguoi_dung_id,
-        newName,
-      );
+      if (fileExtension !== 'gif') {
+        // Sử dụng Sharp để nén ảnh
+        const data = await sharp(file.path)
+          // .resize({ width: 600 })
+          .jpeg({ quality: 70 })
+          .png({ quality: 70 })
+          .toBuffer();
+        fs1.writeFileSync(compressedImagePath, data);
+      }
+
+      console.log(file);
+      return this.imageService.create(file, +verifyToken?.nguoi_dung_id, mo_ta);
     } catch (error) {
+      console.log(error);
       throw new HttpException(
-        'Error converting image to Base64',
+        'Internal Server Error',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -187,10 +209,10 @@ export class ImageController {
     return this.imageService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateImageDto: UpdateImageDto) {
-    return this.imageService.update(+id, updateImageDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateImageDto: UpdateImageDto) {
+  //   return this.imageService.update(+id, updateImageDto);
+  // }
 
   @ApiHeader({ name: 'token' })
   @HttpCode(200)

@@ -23,15 +23,15 @@ import { ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 export class SaveimageController {
   constructor(private readonly saveimageService: SaveimageService) {}
 
-  @Post()
-  create(@Body() createSaveimageDto: CreateSaveimageDto) {
-    return this.saveimageService.create(createSaveimageDto);
-  }
+  // @Post()
+  // create(@Body() createSaveimageDto: CreateSaveimageDto) {
+  //   return this.saveimageService.create(createSaveimageDto);
+  // }
 
-  @Get()
-  findAll() {
-    return this.saveimageService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.saveimageService.findAll();
+  // }
 
   @ApiHeader({ name: 'token' })
   @HttpCode(200)
@@ -47,16 +47,16 @@ export class SaveimageController {
     );
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateSaveimageDto: UpdateSaveimageDto,
-  ) {
-    return this.saveimageService.update(+id, updateSaveimageDto);
-  }
+  // @Patch(':id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() updateSaveimageDto: UpdateSaveimageDto,
+  // ) {
+  //   return this.saveimageService.update(+id, updateSaveimageDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.saveimageService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.saveimageService.remove(+id);
+  // }
 }

@@ -6,19 +6,34 @@ import { PrismaClient, hinh_anh } from '@prisma/client';
 @Injectable()
 export class ImageService {
   prisma = new PrismaClient();
-  async create(file: Express.Multer.File, userId: number, path:string) {
+  async create(file: Express.Multer.File, userId: number, mo_ta: string) {
     try {
       const getUserById = await this.prisma.nguoi_dung.findFirst({
         where: { nguoi_dung_id: userId },
       });
       if (getUserById) {
         const data = await this.prisma.hinh_anh.create({
-          data: {ten_hinh: file.filename, duong_dan: file.path, nguoi_dung_id: userId}
-        })
-        return data;
+          data: {
+            ten_hinh: file.filename,
+            duong_dan: file.path,
+            nguoi_dung_id: userId,
+            mo_ta,
+          },
+        });
+        throw new HttpException(
+          {
+            mess: {
+              data,
+              message: 'Upload image successful',
+              sttatusCode: 200,
+            },
+            code: 200,
+          },
+          200,
+        );
       }
       throw new HttpException({ mess: 'User not found', code: 401 }, 401);
-    } catch(ex) {
+    } catch (ex) {
       throw new HttpException(
         ex.response?.mess,
         ex?.status != 500 ? ex?.response?.code : 500,
